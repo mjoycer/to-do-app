@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const TaskForm = () => {
@@ -6,6 +6,7 @@ const TaskForm = () => {
     const dispatch = useDispatch();
     const [newTask, setNewTask] = useState([]);
     const [errorMessaqge, setErrorMessage] = useState();
+    const inputElement = useRef(null)
 
     const onAddTask = () => {
         let included = false;
@@ -14,8 +15,6 @@ const TaskForm = () => {
         if(newTask.length > 0){
             isEmpty = false;
         }
-
-        console.log(isEmpty);
 
         (isEmpty === false) ? tasks.map(task => {
             if (task.name.toLowerCase() === newTask.toLowerCase()) { included = true; } return task;
@@ -34,6 +33,7 @@ const TaskForm = () => {
     const onSubmitHandle = (e) => {
         e.preventDefault();
         e.target.reset();
+        inputElement.current.focus()
     }
 
     const onChangeHandle = (e) => {
@@ -41,11 +41,16 @@ const TaskForm = () => {
         setErrorMessage();
     }
 
-    console.log(newTask);
+    useEffect(() => {
+        if (inputElement.current) {
+          inputElement.current.focus();
+        }
+      }, []);
+
     return (
         <div className="newTaskContainer">
             <form onSubmit={onSubmitHandle}>
-                <input type="text" value={newTask} onChange={(e) => onChangeHandle(e)} />
+                <input type="text" value={newTask} onChange={(e) => onChangeHandle(e)} style={errorMessaqge && { outlineColor: 'red' }} ref={inputElement}/>
                 <span>{errorMessaqge}</span>
                 <button onClick={onAddTask}>Add Task</button>
             </form>
